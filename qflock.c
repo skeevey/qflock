@@ -1,5 +1,3 @@
-// gcc -DKXVER=3 qflock.c -o qflock.so -lpthread -fPIC -shared
-
 #include <sys/file.h>
 #include <unistd.h>
 #include <stdio.h>
@@ -54,9 +52,9 @@ K lock(K lock_file, K max_wait_time) {
             return krr("timeout");
         }
 
-        // Wait before retrying
         close(fd);
-        usleep(500000); // Retry after 500ms
+        // Wait before retrying
+        usleep(500000);
     }
     return krr("stop");
 }
