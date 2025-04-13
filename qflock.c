@@ -20,6 +20,7 @@ K lock(K lock_file, K max_wait_time) {
     if (lock_file->t != -KS || max_wait_time->t != -KI) {
         return krr("type");
     }
+    interrupted = 0;
     const char *lockFile = lock_file->s;
     int maxWaitTime = max_wait_time->i;
     struct sigaction sa;
