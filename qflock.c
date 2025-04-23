@@ -1,36 +1,24 @@
 #include <sys/file.h>
 #include <unistd.h>
 #include <stdio.h>
+#include <stdbool.h>
 #include <fcntl.h>
 #include <errno.h>
-#include <signal.h>
 #include <time.h>
 #include "k.h"
-
-volatile sig_atomic_t interrupted = 0;
-
-void handle_sigint(int sig) {
-    (void) sig;
-    interrupted = 1;
-}
 
 K lock(K lock_file, K max_wait_time) {
     if (lock_file->t != -KS || max_wait_time->t != -KI) {
         return krr("type");
     }
-    interrupted = 0;
     const char *lockFile = lock_file->s;
     int maxWaitTime = max_wait_time->i;
-    struct sigaction sa;
-    sa.sa_handler = handle_sigint;
-    sa.sa_flags = SA_RESTART;
-    sigaction(SIGINT, &sa, NULL);
 
     struct timespec start, current;
     clock_gettime(CLOCK_MONOTONIC, &start);
 
     int fd = -1;
-    while (!interrupted) {
+    while (true) {
         fd = open(lockFile, O_CREAT | O_RDWR, 0644);
         if (fd == -1) {
             return krr("open_failed");
